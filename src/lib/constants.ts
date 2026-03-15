@@ -8,7 +8,9 @@ export const HERO_IMAGES = [
 
 export const HOLD = 7;
 export const WIPE = 2.5;
-export const SKEW = 35;
+
+/** Target wipe angle in degrees from vertical (0 = straight vertical edge). */
+export const WIPE_ANGLE_DEG = 25;
 
 /**
  * Each image is visible for 2 full cycles:

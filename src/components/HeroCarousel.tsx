@@ -2,10 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import { clipAt } from "@/lib/clip-path";
+import { clipAt, getSkewPct } from "@/lib/clip-path";
 import { HERO_IMAGES, HOLD, ZOOM_FROM, ZOOM_TO, ZOOM_DUR } from "@/lib/constants";
 
 export default function HeroCarousel({ ready }: { ready: boolean }) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const aRef = useRef<HTMLDivElement>(null);
   const bRef = useRef<HTMLDivElement>(null);
   const aImgRef = useRef<HTMLImageElement>(null);
@@ -14,14 +15,20 @@ export default function HeroCarousel({ ready }: { ready: boolean }) {
   useEffect(() => {
     if (!ready) return;
 
+    const container = containerRef.current;
     const a = aRef.current;
     const b = bRef.current;
     const aImg = aImgRef.current;
     const bImg = bImgRef.current;
-    if (!a || !b || !aImg || !bImg) return;
+    if (!container || !a || !b || !aImg || !bImg) return;
 
     let idx = 0;
     let front: "a" | "b" = "a";
+
+    function skew() {
+      const { width, height } = container!.getBoundingClientRect();
+      return getSkewPct(width, height);
+    }
 
     const L = {
       a: { wrap: a, img: aImg, zoom: null as gsap.core.Tween | null },
@@ -38,13 +45,14 @@ export default function HeroCarousel({ ready }: { ready: boolean }) {
       }
 
       function wipeIn(el: HTMLDivElement, onDone: () => void) {
+        const s = skew();
         const proxy = { p: 0 };
         gsap.to(proxy, {
           p: 1,
           duration: 2.5,
           ease: "power2.inOut",
           onUpdate: () => {
-            el.style.clipPath = clipAt(proxy.p);
+            el.style.clipPath = clipAt(proxy.p, s);
           },
           onComplete: onDone,
         });
@@ -61,7 +69,7 @@ export default function HeroCarousel({ ready }: { ready: boolean }) {
         fg.img.src = HERO_IMAGES[nextIdx];
 
         if (fg.zoom) fg.zoom.kill();
-        gsap.set(fg.wrap, { scale: ZOOM_FROM, zIndex: 2, clipPath: clipAt(0) });
+        gsap.set(fg.wrap, { scale: ZOOM_FROM, zIndex: 2, clipPath: clipAt(0, skew()) });
         gsap.set(bg.wrap, { zIndex: 1 });
 
         fg.zoom = zoom(fg.wrap);
@@ -91,7 +99,7 @@ export default function HeroCarousel({ ready }: { ready: boolean }) {
   }, [ready]);
 
   return (
-    <>
+    <div ref={containerRef} className="absolute inset-0">
       <div ref={aRef} className="absolute inset-0 origin-center will-change-transform">
         {/* eslint-disable-next-line @next/next/no-img-element -- raw img required for GSAP clip-path animation */}
         <img
@@ -111,6 +119,6 @@ export default function HeroCarousel({ ready }: { ready: boolean }) {
           className="absolute inset-0 h-full w-full object-cover"
         />
       </div>
-    </>
+    </div>
   );
 }
