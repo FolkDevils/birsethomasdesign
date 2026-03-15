@@ -7,7 +7,7 @@
   <clipPath id="birseWipeW">
     <polygon points="-43,88 -10,0 -10,0 -43,88">
       <animate attributeName="points" 
-        values="-43,88 -10,0 -10,0 -43,88; -43,88 -10,0 278,0 245,88" 
+        values="-43,88 -10,0 -10,0 -43,88; -43,88 -10,0 298,0 265,88" 
         dur="1.5s" begin="0s" fill="freeze" 
         calcMode="spline" keySplines="0.4 0 0.2 1"/>
     </polygon>
@@ -16,7 +16,7 @@
   <clipPath id="thomasWipeW">
     <polygon points="713,0 680,88 680,88 713,0">
       <animate attributeName="points" 
-        values="713,0 680,88 680,88 713,0; 278,0 245,88 680,88 713,0" 
+        values="713,0 680,88 680,88 713,0; 258,0 225,88 680,88 713,0" 
         dur="1.5s" begin="0s" fill="freeze" 
         calcMode="spline" keySplines="0.4 0 0.2 1"/>
     </polygon>
@@ -67,7 +67,7 @@
 
 <g id="letter-slash-w">
   <path d="M258.83 85.24C254.73 85.69 250.98 85.69 245.49 85.33L277.38 0.29C281.91 -0.09 285.84 -0.11 290.76 0.29L258.82 85.24H258.83Z" fill="white" opacity="0">
-    <animate attributeName="opacity" values="0;1" dur="0.4s" begin="1.0s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+    <animate attributeName="opacity" values="0;1" dur="0.4s" begin="0.9s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
   </path>
 </g>
 
