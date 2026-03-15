@@ -77,9 +77,9 @@ function MobileMenuButton({ open, onToggle }: { open: boolean; onToggle: () => v
       onClick={onToggle}
       className="relative z-30 flex h-10 w-10 items-center justify-center"
       aria-label="Toggle menu"
-      style={{ filter: open ? "none" : "drop-shadow(0 1px 4px rgba(0,0,0,0.5))" }}
+      style={{ filter: open ? "none" : "drop-shadow(0 1px 80px rgba(0,0,0,0.5))" }}
     >
-      <svg width="34" height="24" viewBox="-2 -1 38 26" fill="none" style={{ transition: "filter 0.3s" }}>
+      <svg width="42" height="30" viewBox="-2 -1 38 26" fill="none" style={{ transition: "filter 0.3s" }}>
         <line ref={leftRef} x1="8" y1="1" x2="0" y2="23" stroke={color} strokeWidth="2" strokeLinecap="butt" style={{ transition: "stroke 0.3s" }} />
         <line ref={midRef} x1="17" y1="1" x2="9" y2="23" stroke={color} strokeWidth="2" strokeLinecap="butt" style={{ transition: "stroke 0.3s" }} />
         <line ref={rightRef} x1="26" y1="1" x2="18" y2="23" stroke={color} strokeWidth="2" strokeLinecap="butt" style={{ transition: "stroke 0.3s" }} />
@@ -91,14 +91,34 @@ function MobileMenuButton({ open, onToggle }: { open: boolean; onToggle: () => v
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activePage] = useState("HOME");
+  const [ready, setReady] = useState(false);
 
   const aRef = useRef<HTMLDivElement>(null);
   const bRef = useRef<HTMLDivElement>(null);
   const aImgRef = useRef<HTMLImageElement>(null);
   const bImgRef = useRef<HTMLImageElement>(null);
+  const logoRef = useRef<HTMLObjectElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    const img = new Image();
+    img.src = HERO_IMAGES[0];
+
+    const reveal = () => {
+      setReady(true);
+    };
+
+    if (img.complete) {
+      reveal();
+    } else {
+      img.onload = reveal;
+      img.onerror = reveal;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+
     const a = aRef.current;
     const b = bRef.current;
     const aImg = aImgRef.current;
@@ -183,136 +203,152 @@ export default function Home() {
     return () => {
       if (cleanupRef.current) cleanupRef.current();
     };
-  }, []);
+  }, [ready]);
+
+  const logoKey = ready ? "logo-reveal" : "logo-hidden";
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-black">
-      {/* Layer A */}
-      <div ref={aRef} className="absolute inset-0 will-change-transform origin-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          ref={aImgRef}
-          alt="Birse Thomas project"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
-
-      {/* Layer B */}
-      <div ref={bRef} className="absolute inset-0 will-change-transform origin-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          ref={bImgRef}
-          alt="Birse Thomas project"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
-
-      {/* Tint overlay */}
-      <div className="absolute inset-0 bg-black/20 pointer-events-none" style={{ zIndex: 3 }} />
-
-      {/* Desktop Navigation */}
-      <nav className="absolute top-0 left-0 right-0 z-20 hidden md:block">
-        <div className="flex items-center justify-end bg-white border-b border-neutral-200">
-          <ul className="flex items-center">
-            {NAV_ITEMS.map((item) => (
-              <li key={item}>
-                <a
-                  href={`#${item.toLowerCase()}`}
-                  className={`nav-link inline-block px-5 lg:px-7 py-4 text-[10px] font-bold tracking-[0.1em] text-neutral-900 transition-colors duration-200 hover:text-neutral-900 ${
-                    activePage === item ? "active" : ""
-                  }`}
-                >
-                  <svg
-                    className="nav-slash"
-                    height="11"
-                    viewBox="-2 -2 12 26"
-                    preserveAspectRatio="xMidYMid meet"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <line
-                      x1="0" y1="22"
-                      x2="8" y2="0"
-                      stroke="currentColor"
-                      strokeWidth="4.5"
-                      strokeLinecap="butt"
-                    />
-                  </svg>
-                  {item}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
-
-      {/* Mobile Navigation */}
-      <nav className="absolute top-0 left-0 right-0 z-20 md:hidden">
-        <div className="relative z-30 flex items-center justify-between px-5 py-5">
-          <MobileMenuButton open={mobileMenuOpen} onToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
-        </div>
-
-        {/* Mobile menu — fullscreen white */}
-        <div
-          className={`fixed inset-0 z-20 flex flex-col items-start justify-end pb-24 bg-white transition-all duration-500 ease-in-out ${
-            mobileMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"
-          }`}
-        >
-          <ul className="flex flex-col gap-0 px-14">
-            {NAV_ITEMS.map((item, i) => (
-              <li
-                key={item}
-                className=""
-                style={{
-                  opacity: mobileMenuOpen ? 1 : 0,
-                  transform: mobileMenuOpen ? "translateY(0)" : "translateY(20px)",
-                  transition: `opacity 0.4s ease ${i * 0.06 + 0.15}s, transform 0.4s ease ${i * 0.06 + 0.15}s`,
-                }}
-              >
-                <a
-                  href={`#${item.toLowerCase()}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`nav-link mobile-nav inline-block py-3 text-[clamp(1.5rem,5vw,2.5rem)] font-bold tracking-[0.02em] text-neutral-900 ${
-                    activePage === item ? "active" : ""
-                  }`}
-                >
-                  <svg
-                    className="nav-slash"
-                    height="24"
-                    viewBox="0 0 6 14"
-                    preserveAspectRatio="xMidYMid meet"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    style={{ left: "-24px" }}
-                  >
-                    <line
-                      x1="0.5" y1="14"
-                      x2="5.5" y2="0"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="square"
-                    />
-                  </svg>
-                  {item}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
-
-      {/* Centered Logo */}
+    <>
+      {/* White loading screen */}
       <div
-        className="absolute inset-0 z-10 flex items-center justify-center px-8 md:px-16"
-        style={{ filter: "drop-shadow(0 2px 40px rgba(0,0,0,0.45))" }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/Logo_BirseThomas_White.svg"
-          alt="Birse Thomas"
-          className="w-full max-w-[90%] md:max-w-[560px] lg:max-w-[640px]"
-        />
+        className="fixed inset-0 z-[100] bg-white transition-opacity duration-700 ease-in-out"
+        style={{
+          opacity: ready ? 0 : 1,
+          pointerEvents: ready ? "none" : "auto",
+        }}
+      />
+
+      <div className="relative h-dvh w-full overflow-hidden bg-black">
+        {/* Layer A */}
+        <div ref={aRef} className="absolute inset-0 will-change-transform origin-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            ref={aImgRef}
+            alt="Birse Thomas project"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Layer B */}
+        <div ref={bRef} className="absolute inset-0 will-change-transform origin-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            ref={bImgRef}
+            alt="Birse Thomas project"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Tint overlay */}
+        <div className="absolute inset-0 bg-black/20 pointer-events-none" style={{ zIndex: 3 }} />
+
+        {/* Desktop Navigation */}
+        <nav className="absolute top-0 left-0 right-0 z-20 hidden md:block">
+          <div className="flex items-center justify-end bg-white border-b border-neutral-200">
+            <ul className="flex items-center">
+              {NAV_ITEMS.map((item) => (
+                <li key={item}>
+                  <a
+                    href={`#${item.toLowerCase()}`}
+                    className={`nav-link inline-block px-5 lg:px-7 py-4 text-[10px] font-bold tracking-[0.1em] text-neutral-900 transition-colors duration-200 hover:text-neutral-900 ${
+                      activePage === item ? "active" : ""
+                    }`}
+                  >
+                    <svg
+                      className="nav-slash"
+                      height="11"
+                      viewBox="-2 -2 12 26"
+                      preserveAspectRatio="xMidYMid meet"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <line
+                        x1="0" y1="22"
+                        x2="8" y2="0"
+                        stroke="currentColor"
+                        strokeWidth="4.5"
+                        strokeLinecap="butt"
+                      />
+                    </svg>
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+
+        {/* Mobile Navigation */}
+        <nav className="absolute top-0 left-0 right-0 z-20 md:hidden">
+          <div className="relative z-30 flex items-center justify-between px-5 py-5">
+            <MobileMenuButton open={mobileMenuOpen} onToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
+          </div>
+
+          {/* Mobile menu — fullscreen white */}
+          <div
+            className={`fixed inset-0 z-20 flex flex-col items-start justify-end pb-24 bg-white transition-all duration-500 ease-in-out ${
+              mobileMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
+          >
+            <ul className="flex flex-col gap-0 px-14">
+              {NAV_ITEMS.map((item, i) => (
+                <li
+                  key={item}
+                  style={{
+                    opacity: mobileMenuOpen ? 1 : 0,
+                    transform: mobileMenuOpen ? "translateY(0)" : "translateY(20px)",
+                    transition: `opacity 0.4s ease ${i * 0.06 + 0.15}s, transform 0.4s ease ${i * 0.06 + 0.15}s`,
+                  }}
+                >
+                  <a
+                    href={`#${item.toLowerCase()}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`nav-link mobile-nav inline-block py-3 text-[clamp(1.5rem,5vw,2.5rem)] font-bold tracking-[0.02em] text-neutral-900 ${
+                      activePage === item ? "active" : ""
+                    }`}
+                  >
+                    <svg
+                      className="nav-slash"
+                      height="24"
+                      viewBox="0 0 6 14"
+                      preserveAspectRatio="xMidYMid meet"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      style={{ left: "-24px" }}
+                    >
+                      <line
+                        x1="0.5" y1="14"
+                        x2="5.5" y2="0"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="square"
+                      />
+                    </svg>
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+
+        {/* Centered Logo — <object> forces SVG animation replay on each mount */}
+        <div
+          className="absolute inset-0 z-10 flex items-center justify-center px-8 md:px-16"
+          style={{ filter: "drop-shadow(0 2px 4800px rgba(0,0,0,0.45))" }}
+        >
+          {ready && (
+            <object
+              key={logoKey}
+              ref={logoRef}
+              data="/Logo_BirseThomas_White.svg"
+              type="image/svg+xml"
+              aria-label="Birse Thomas"
+              className="w-full max-w-[90%] md:max-w-[560px] lg:max-w-[640px] pointer-events-none"
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
