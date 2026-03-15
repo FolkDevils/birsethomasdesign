@@ -97,7 +97,7 @@ export default function Home() {
   const bRef = useRef<HTMLDivElement>(null);
   const aImgRef = useRef<HTMLImageElement>(null);
   const bImgRef = useRef<HTMLImageElement>(null);
-  const logoRef = useRef<HTMLObjectElement>(null);
+  const [logoSrc] = useState(() => `/Logo_BirseThomas_White.svg?v=${Date.now()}`);
   const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -204,8 +204,6 @@ export default function Home() {
       if (cleanupRef.current) cleanupRef.current();
     };
   }, [ready]);
-
-  const logoKey = ready ? "logo-reveal" : "logo-hidden";
 
   return (
     <>
@@ -332,19 +330,17 @@ export default function Home() {
           </div>
         </nav>
 
-        {/* Centered Logo — <object> forces SVG animation replay on each mount */}
+        {/* Centered Logo — cache-busted src replays SVG SMIL animation on each refresh */}
         <div
           className="absolute inset-0 z-10 flex items-center justify-center px-8 md:px-16"
           style={{ filter: "drop-shadow(0 2px 4800px rgba(0,0,0,0.45))" }}
         >
           {ready && (
-            <object
-              key={logoKey}
-              ref={logoRef}
-              data="/Logo_BirseThomas_White.svg"
-              type="image/svg+xml"
-              aria-label="Birse Thomas"
-              className="w-full max-w-[90%] md:max-w-[560px] lg:max-w-[640px] pointer-events-none"
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={logoSrc}
+              alt="Birse Thomas"
+              className="w-full max-w-[90%] md:max-w-[560px] lg:max-w-[640px]"
             />
           )}
         </div>
