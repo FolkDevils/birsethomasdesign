@@ -330,19 +330,17 @@ export default function Home() {
           </div>
         </nav>
 
-        {/* Centered Logo — cache-busted src replays SVG SMIL animation on each refresh */}
+        {/* Centered Logo — always mounted so SMIL animation starts immediately */}
         <div
           className="absolute inset-0 z-10 flex items-center justify-center px-8 md:px-16"
           style={{ filter: "drop-shadow(0 2px 4800px rgba(0,0,0,0.45))" }}
         >
-          {ready && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={logoSrc}
-              alt="Birse Thomas"
-              className="w-full max-w-[90%] md:max-w-[560px] lg:max-w-[640px]"
-            />
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logoSrc}
+            alt="Birse Thomas"
+            className="w-full max-w-[90%] md:max-w-[560px] lg:max-w-[640px]"
+          />
         </div>
       </div>
     </>
